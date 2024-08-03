@@ -1,0 +1,1580 @@
+[
+    {
+        "id": "5ec824872cd94a31",
+        "type": "subflow",
+        "name": "AC",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 80,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "d4d4d85cfa3381e0"
+                    },
+                    {
+                        "id": "aeebdc64229a5257"
+                    },
+                    {
+                        "id": "4262a377b349288b"
+                    },
+                    {
+                        "id": "7bfc45a210da7543"
+                    },
+                    {
+                        "id": "94a125713cf50d2b"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 420,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "d4d4d85cfa3381e0",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "94a125713cf50d2b",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "aeebdc64229a5257",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 200,
+                "wires": [
+                    {
+                        "id": "4262a377b349288b",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 240,
+                "wires": [
+                    {
+                        "id": "7bfc45a210da7543",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "d4d4d85cfa3381e0",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "开关",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.Active !== undefined) {\n        flow.set(\"state\", msg.payload.Active);\n        node.log('发送空调开关：' + msg.payload.Active);\n        if (Boolean(msg.payload.Active) === true) {\n            return { payload: true };\n        }\n        else if (Boolean(msg.payload.Active) === false) {\n            return { payload: false };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aeebdc64229a5257",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "设置制热温度",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.HeatingThresholdTemperature !== undefined) {\n        node.log('发送空调制热温度：' + msg.payload.HeatingThresholdTemperature);\n        return { payload: msg.payload.HeatingThresholdTemperature };\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4262a377b349288b",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "设置制冷温度",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.CoolingThresholdTemperature !== undefined) {\n        node.log('发送空调制冷温度：' + msg.payload.CoolingThresholdTemperature);\n        return { payload: msg.payload.CoolingThresholdTemperature };\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7bfc45a210da7543",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "风速",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    var value = 0;\n    if (msg.payload.RotationSpeed !== undefined) {\n        if (msg.payload.RotationSpeed > 0 && msg.payload.RotationSpeed <= 34)\n        {\n            value = 1;\n        }\n        else if (msg.payload.RotationSpeed > 34 && msg.payload.RotationSpeed <= 67)\n        {\n            value = 3;\n        }\n        else if (msg.payload.RotationSpeed > 67 && msg.payload.RotationSpeed <= 101)\n        {\n            value = 5;\n        }\n    }\n    // reset rotationspeed when shutdown.\n    if (msg.payload.Active !== undefined) {\n        if (Boolean(msg.payload.Active) === false) {\n            value = 0;\n        }\n    }\n    node.log('发送空调风速：' + value);\n    return { payload: value };\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "94a125713cf50d2b",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "模式",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.TargetHeaterCoolerState !== undefined) {\n        if (msg.payload.TargetHeaterCoolerState === 1) {\n            node.log('发送空调模式：制热');\n            return { payload: 1 };\n        }\n        else if (msg.payload.TargetHeaterCoolerState === 2) {\n            node.log('发送空调模式：制冷');\n            return { payload: 3 };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5207b905716868ba",
+        "type": "tab",
+        "label": "客厅",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "92cca2fca2f99551",
+        "type": "homekit-service",
+        "z": "5207b905716868ba",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "b40c437ba7dc34d1",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "主灯",
+        "serviceName": "Lightbulb",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "NRCHKB",
+        "model": "1.4.3",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.4.3",
+        "hardwareRev": "1.4.3",
+        "softwareRev": "1.4.3",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "{}",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 790,
+        "y": 180,
+        "wires": [
+            [
+                "c30cf87e4cc1b112"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "67db20ad9bb0faa8",
+        "type": "homekit-service",
+        "z": "5207b905716868ba",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "b40c437ba7dc34d1",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "灯带",
+        "serviceName": "Lightbulb",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "NRCHKB",
+        "model": "1.4.3",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.4.3",
+        "hardwareRev": "1.4.3",
+        "softwareRev": "1.4.3",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "{}",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 790,
+        "y": 280,
+        "wires": [
+            [
+                "57e9f1bb31a05cb2"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "9ff8e65d30640293",
+        "type": "homekit-service",
+        "z": "5207b905716868ba",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "b40c437ba7dc34d1",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "筒灯",
+        "serviceName": "Lightbulb",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "NRCHKB",
+        "model": "1.4.3",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.4.3",
+        "hardwareRev": "1.4.3",
+        "softwareRev": "1.4.3",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "{}",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 790,
+        "y": 380,
+        "wires": [
+            [
+                "ec247d4fc8e2c4f4"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d45da27eeb02cfaf",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/1/131",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "开关反馈",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 160,
+        "y": 520,
+        "wires": [
+            [
+                "a400ba7f1bc00dc2",
+                "d82c1e5f8afb78f9",
+                "efb34919a8ea36e3",
+                "b8730c3044dce17e"
+            ]
+        ]
+    },
+    {
+        "id": "d82c1e5f8afb78f9",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/2/131",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "模式反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 390,
+        "y": 580,
+        "wires": [
+            [
+                "840b8867cb1dd539"
+            ]
+        ]
+    },
+    {
+        "id": "efb34919a8ea36e3",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/3/131",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "风速反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 390,
+        "y": 640,
+        "wires": [
+            [
+                "35d6052523a9bdb9"
+            ]
+        ]
+    },
+    {
+        "id": "b8730c3044dce17e",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/4/131",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "9.001",
+        "initialread": "3",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "设置温度反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 400,
+        "y": 700,
+        "wires": [
+            [
+                "3dc6aac4ae8cf75c"
+            ]
+        ]
+    },
+    {
+        "id": "5ed7340fb82f3da1",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/5/131",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "9.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "实际温度反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 400,
+        "y": 760,
+        "wires": [
+            [
+                "7120dda8b5074033"
+            ]
+        ]
+    },
+    {
+        "id": "7120dda8b5074033",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "室内温度反馈",
+        "func": "node.log('收到室内温度反馈:'+msg.payload);\nreturn { payload: { \"CurrentTemperature\": msg.payload }}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 760,
+        "wires": [
+            [
+                "29410541a718daf6"
+            ]
+        ]
+    },
+    {
+        "id": "35d6052523a9bdb9",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "风速",
+        "func": "node.log('收到空调风速反馈:'+msg.payload);\nif(msg.payload === 0) \n{\n    return { payload: { \"RotationSpeed\": 0 }}\n}\nelse if(msg.payload === 1) \n{\n    return { payload: { \"RotationSpeed\": 33 } }\n}\nelse if(msg.payload === 3) \n{\n    return { payload: { \"RotationSpeed\": 66 } }\n}\nelse if(msg.payload === 5) \n{\n    return { payload: { \"RotationSpeed\": 100 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 640,
+        "wires": [
+            [
+                "29410541a718daf6"
+            ]
+        ]
+    },
+    {
+        "id": "840b8867cb1dd539",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "模式",
+        "func": "node.log('收到空调模式反馈:'+msg.payload);\nif(msg.payload === 1) \n{\n  return { payload: { \"CurrentHeaterCoolerState\": 2, \"TargetHeaterCoolerState\": 1 }}\n} \nelse if(msg.payload === 3) \n{\n  return { payload: { \"CurrentHeaterCoolerState\": 3, \"TargetHeaterCoolerState\": 2 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 580,
+        "wires": [
+            [
+                "29410541a718daf6"
+            ]
+        ]
+    },
+    {
+        "id": "29410541a718daf6",
+        "type": "homekit-service",
+        "z": "5207b905716868ba",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "b40c437ba7dc34d1",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "空调",
+        "serviceName": "HeaterCooler",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "IOT DREAM",
+        "model": "1.3.6",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.3.6",
+        "hardwareRev": "1.3.6",
+        "softwareRev": "1.3.6",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "{     \"TargetHeaterCoolerState\": {         \"validValues\": [             1,             2         ]     },     \"CurrentHeaterCoolerState\": {         \"validValues\": [             0,             2,             3         ]     },     \"HeatingThresholdTemperature\": {         \"minValue\": 16,         \"maxValue\": 32,         \"minStep\": 1     },     \"CoolingThresholdTemperature\": {         \"minValue\": 16,         \"maxValue\": 32,         \"minStep\": 1     },     \"RotationSpeed\": {         \"minValue\": 0,         \"maxValue\": 100,         \"minStep\": 33     } }",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 660,
+        "wires": [
+            [
+                "8934cfb420189506"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "8934cfb420189506",
+        "type": "subflow:5ec824872cd94a31",
+        "z": "5207b905716868ba",
+        "name": "",
+        "env": [],
+        "x": 1230,
+        "y": 660,
+        "wires": [
+            [
+                "34ea192f3631265b"
+            ],
+            [
+                "86d435753f3e713b"
+            ],
+            [
+                "be12c82669a7c520"
+            ],
+            [
+                "be12c82669a7c520"
+            ],
+            [
+                "431f89f5dd77ee96"
+            ]
+        ]
+    },
+    {
+        "id": "3dc6aac4ae8cf75c",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "设置温度反馈",
+        "func": "node.log('收到空调设置温度反馈:'+msg.payload);\nvar value  = msg.payload;\nvar HeatingThresholdTemperature = {};\nvar CoolingThresholdTemperature = {};\nHeatingThresholdTemperature.payload = {\"HeatingThresholdTemperature\":value}\nCoolingThresholdTemperature.payload = {\"CoolingThresholdTemperature\":value}\nreturn [HeatingThresholdTemperature,CoolingThresholdTemperature];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 700,
+        "wires": [
+            [
+                "29410541a718daf6"
+            ],
+            [
+                "29410541a718daf6"
+            ]
+        ]
+    },
+    {
+        "id": "34ea192f3631265b",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/1/3",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "开关地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1530,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "86d435753f3e713b",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/2/3",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "模式地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1530,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "431f89f5dd77ee96",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/3/3",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "风速地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1530,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "be12c82669a7c520",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "12/4/3",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "9.001",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "目标温度地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1540,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6d1c04a4272269f1",
+        "type": "inject",
+        "z": "5207b905716868ba",
+        "name": "循环获取温度",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 760,
+        "wires": [
+            [
+                "5ed7340fb82f3da1"
+            ]
+        ]
+    },
+    {
+        "id": "a400ba7f1bc00dc2",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "开关",
+        "func": "node.log('收到空调开关反馈:'+msg.payload);\nif (Boolean(msg.payload) === true) {\n    return { payload: { \"Active\": 1 } }\n}\nelse if (Boolean(msg.payload) === false) {\n    return { payload: { \"Active\": 0 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 520,
+        "wires": [
+            [
+                "29410541a718daf6"
+            ]
+        ]
+    },
+    {
+        "id": "4d1dafb2f77e0d57",
+        "type": "homekit-service",
+        "z": "5207b905716868ba",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "b40c437ba7dc34d1",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "布帘",
+        "serviceName": "WindowCovering",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "IOT DREAM",
+        "model": "1.3.6",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.3.6",
+        "hardwareRev": "1.3.6",
+        "softwareRev": "1.3.6",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 810,
+        "y": 1040,
+        "wires": [
+            [
+                "7adedb476c177eb5"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "76963f2ecd42abd6",
+        "type": "homekit-service",
+        "z": "5207b905716868ba",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "b40c437ba7dc34d1",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "纱帘",
+        "serviceName": "WindowCovering",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "IOT DREAM",
+        "model": "1.3.6",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.3.6",
+        "hardwareRev": "1.3.6",
+        "softwareRev": "1.3.6",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 810,
+        "y": 1260,
+        "wires": [
+            [
+                "2145fdee49134e62"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "1eeecf8b7891a810",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "1/0/23",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "",
+        "listenallga": false,
+        "name": "Light Status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "passthrough": "no",
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "eaa2754e7cc4054a"
+            ]
+        ]
+    },
+    {
+        "id": "eaa2754e7cc4054a",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "ON/OFF",
+        "func": "// Verifico cosa ricevo dall'input\nif (Boolean(msg.payload) === true) {\n    return {payload:{\"On\":true}}\n}\nelse if (Boolean(msg.payload) === false)\n{\n    return {payload:{\"On\":false}}\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 180,
+        "wires": [
+            [
+                "92cca2fca2f99551"
+            ]
+        ]
+    },
+    {
+        "id": "d6ebc3240ff1e179",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "1/0/23",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": 0,
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "",
+        "listenallga": false,
+        "name": "Light switch",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "passthrough": "no",
+        "x": 1210,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c30cf87e4cc1b112",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "CONVERSION",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.On !== undefined) {\n        if (Boolean(msg.payload.On) === true) {\n            return { payload: true };\n        }\n        else if (Boolean(msg.payload.On) === false) {\n            return { payload: false };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 180,
+        "wires": [
+            [
+                "d6ebc3240ff1e179"
+            ]
+        ]
+    },
+    {
+        "id": "f8aa34307c8ca163",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "1/0/22",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "",
+        "listenallga": false,
+        "name": "Light Status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "passthrough": "no",
+        "x": 390,
+        "y": 280,
+        "wires": [
+            [
+                "62b0bac052a53306"
+            ]
+        ]
+    },
+    {
+        "id": "62b0bac052a53306",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "ON/OFF",
+        "func": "// Verifico cosa ricevo dall'input\nif (Boolean(msg.payload) === true) {\n    return {payload:{\"On\":true}}\n}\nelse if (Boolean(msg.payload) === false)\n{\n    return {payload:{\"On\":false}}\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 280,
+        "wires": [
+            [
+                "67db20ad9bb0faa8"
+            ]
+        ]
+    },
+    {
+        "id": "d4507213da16b5fc",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "1/0/21",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "",
+        "listenallga": false,
+        "name": "Light Status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "passthrough": "no",
+        "x": 390,
+        "y": 380,
+        "wires": [
+            [
+                "c4b457c3ebbf7aa8"
+            ]
+        ]
+    },
+    {
+        "id": "c4b457c3ebbf7aa8",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "ON/OFF",
+        "func": "// Verifico cosa ricevo dall'input\nif (Boolean(msg.payload) === true) {\n    return {payload:{\"On\":true}}\n}\nelse if (Boolean(msg.payload) === false)\n{\n    return {payload:{\"On\":false}}\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 380,
+        "wires": [
+            [
+                "9ff8e65d30640293"
+            ]
+        ]
+    },
+    {
+        "id": "64ee9f59522266eb",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "1/0/22",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": 0,
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "",
+        "listenallga": false,
+        "name": "Light switch",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "passthrough": "no",
+        "x": 1210,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "57e9f1bb31a05cb2",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "CONVERSION",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.On !== undefined) {\n        if (Boolean(msg.payload.On) === true) {\n            return { payload: true };\n        }\n        else if (Boolean(msg.payload.On) === false) {\n            return { payload: false };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 280,
+        "wires": [
+            [
+                "64ee9f59522266eb"
+            ]
+        ]
+    },
+    {
+        "id": "b2a29f58695aa964",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "1/0/21",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": 0,
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "",
+        "listenallga": false,
+        "name": "Light switch",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "passthrough": "no",
+        "x": 1210,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ec247d4fc8e2c4f4",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "CONVERSION",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.On !== undefined) {\n        if (Boolean(msg.payload.On) === true) {\n            return { payload: true };\n        }\n        else if (Boolean(msg.payload.On) === false) {\n            return { payload: false };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 380,
+        "wires": [
+            [
+                "b2a29f58695aa964"
+            ]
+        ]
+    },
+    {
+        "id": "825653a2317353e4",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "",
+        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst target = flow.get(\"target\");\nconst manual = flow.get(\"manual\");\nif (target !== undefined) {\n    if (manual !== undefined) {\n        if (!manual) {\n            let current = 100 - target;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 1000,
+        "wires": [
+            [
+                "4d1dafb2f77e0d57"
+            ]
+        ]
+    },
+    {
+        "id": "9a64e71e68010a6e",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "2/1/65",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.001",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Covering Status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 420,
+        "y": 1000,
+        "wires": [
+            [
+                "825653a2317353e4"
+            ]
+        ]
+    },
+    {
+        "id": "f77e45e9d1cdf7f8",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "2/0/65",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Covering Manual Status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 410,
+        "y": 1100,
+        "wires": [
+            [
+                "a1842370b428ca71"
+            ]
+        ]
+    },
+    {
+        "id": "a1842370b428ca71",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "",
+        "func": "node.log('窗帘2---------------------' + msg.payload);\nflow.set(\"manual\" , true);\nlet count = flow.get('count') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    msg.payload = {\"CurrentPosition\":count , \"TargetPosition\":count};\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current count immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        count++;\n        if (count >= 100) {\n            count = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        count--;\n        if (count <= 0) {\n            count = 0;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 1100,
+        "wires": [
+            [
+                "4d1dafb2f77e0d57"
+            ]
+        ]
+    },
+    {
+        "id": "7adedb476c177eb5",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "",
+        "func": "// node.log('----------------------------------窗帘2：' + JSON.stringify(msg.payload));\n// var target = flow.get(\"target\");\n// node.log('----------------------------------窗帘3：' + target);\n// if ((typeof target!== 'undefined' && target!== null) ||!target) { \n//     if (msg.payload && msg.payload.hasOwnProperty('TargetPosition')) {\n//         let a = msg.payload.TargetPosition;\n//         a = 100-a;\n//         if (target!== a) {\n//             msg.payload = a;\n//             flow.set(\"target\", a);\n//             return msg;\n//         }\n//     }\n// }\n\n// Pass only messages coming from homekit node\n// const target = flow.get(\"target\");\n// if (msg.hap.context !== undefined) {\n//     const manual = flow.get(\"manual\");\n//     node.log('======================' + manual);\n//     if (manual !== undefined) {\n//         if (!manual) {\n//             if (msg.payload.TargetPosition !== undefined) {\n//                 let position = 100 - msg.payload.TargetPosition;\n//                 if(target !== position) {\n//                     flow.set(\"target\", position);\n//                     return { payload: position};\n//                 }\n//             }\n//         }\n//     } else {\n//         if (msg.payload.TargetPosition !== undefined) {\n//             let position = 100 - msg.payload.TargetPosition;\n//             if(target !== position) {\n//                 flow.set(\"target\", position);                \n//                 return { payload: position};\n//             }\n//         }\n//     }\n//     flow.set(\"manual\", false);\n// }\n\nconst target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const manual = flow.get(\"manual\");\n    node.log('======================' + manual);\n\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n\n        if (manual === undefined || !manual) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"manual\", false);\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 1040,
+        "wires": [
+            [
+                "d36a7d0e1ba1c49a"
+            ]
+        ]
+    },
+    {
+        "id": "d36a7d0e1ba1c49a",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "2/1/65",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.001",
+        "initialread": 0,
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Covering",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1220,
+        "y": 1040,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6b6f602e0efec308",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "",
+        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst target = flow.get(\"target\");\nconst manual = flow.get(\"manual\");\nif (target !== undefined) {\n    if (manual !== undefined) {\n        if (!manual) {\n            let current = 100 - target;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 1220,
+        "wires": [
+            [
+                "76963f2ecd42abd6"
+            ]
+        ]
+    },
+    {
+        "id": "81ca53173c6de0f8",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "2/1/66",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.001",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Covering Status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 420,
+        "y": 1220,
+        "wires": [
+            [
+                "6b6f602e0efec308"
+            ]
+        ]
+    },
+    {
+        "id": "c0724e28947119f0",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "2/0/66",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Covering Manual Status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 410,
+        "y": 1320,
+        "wires": [
+            [
+                "f71f14903c254c9a"
+            ]
+        ]
+    },
+    {
+        "id": "f71f14903c254c9a",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "",
+        "func": "node.log('窗帘2---------------------' + msg.payload);\nflow.set(\"manual\" , true);\nlet count = flow.get('count') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    msg.payload = {\"CurrentPosition\":count , \"TargetPosition\":count};\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current count immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        count++;\n        if (count >= 100) {\n            count = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        count--;\n        if (count <= 0) {\n            count = 0;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 1320,
+        "wires": [
+            [
+                "76963f2ecd42abd6"
+            ]
+        ]
+    },
+    {
+        "id": "2145fdee49134e62",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "",
+        "func": "// node.log('----------------------------------窗帘2：' + JSON.stringify(msg.payload));\n// var target = flow.get(\"target\");\n// node.log('----------------------------------窗帘3：' + target);\n// if ((typeof target!== 'undefined' && target!== null) ||!target) { \n//     if (msg.payload && msg.payload.hasOwnProperty('TargetPosition')) {\n//         let a = msg.payload.TargetPosition;\n//         a = 100-a;\n//         if (target!== a) {\n//             msg.payload = a;\n//             flow.set(\"target\", a);\n//             return msg;\n//         }\n//     }\n// }\n\n// Pass only messages coming from homekit node\n// const target = flow.get(\"target\");\n// if (msg.hap.context !== undefined) {\n//     const manual = flow.get(\"manual\");\n//     node.log('======================' + manual);\n//     if (manual !== undefined) {\n//         if (!manual) {\n//             if (msg.payload.TargetPosition !== undefined) {\n//                 let position = 100 - msg.payload.TargetPosition;\n//                 if(target !== position) {\n//                     flow.set(\"target\", position);\n//                     return { payload: position};\n//                 }\n//             }\n//         }\n//     } else {\n//         if (msg.payload.TargetPosition !== undefined) {\n//             let position = 100 - msg.payload.TargetPosition;\n//             if(target !== position) {\n//                 flow.set(\"target\", position);                \n//                 return { payload: position};\n//             }\n//         }\n//     }\n//     flow.set(\"manual\", false);\n// }\n\nconst target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const manual = flow.get(\"manual\");\n    node.log('======================' + manual);\n\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n\n        if (manual === undefined || !manual) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"manual\", false);\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 1260,
+        "wires": [
+            [
+                "28b1d7e11ac27383"
+            ]
+        ]
+    },
+    {
+        "id": "28b1d7e11ac27383",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "2/1/66",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.001",
+        "initialread": 0,
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Covering",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1220,
+        "y": 1260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b40c437ba7dc34d1",
+        "type": "homekit-bridge",
+        "bridgeName": "Living room",
+        "pinCode": "6923-5024",
+        "port": "",
+        "advertiser": "bonjour-hap",
+        "allowInsecureRequest": false,
+        "manufacturer": "NRCHKB",
+        "model": "1.6.1",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.6.1",
+        "hardwareRev": "1.6.1",
+        "softwareRev": "1.6.1",
+        "customMdnsConfig": false,
+        "mdnsMulticast": true,
+        "mdnsInterface": "",
+        "mdnsPort": "",
+        "mdnsIp": "",
+        "mdnsTtl": "",
+        "mdnsLoopback": true,
+        "mdnsReuseAddr": true,
+        "allowMessagePassthrough": true
+    },
+    {
+        "id": "1d670c832649ebb6",
+        "type": "knxUltimate-config",
+        "host": "192.168.1.7",
+        "port": "3671",
+        "physAddr": "14.14.14",
+        "hostProtocol": "TunnelUDP",
+        "suppressACKRequest": true,
+        "csv": "",
+        "KNXEthInterface": "Auto",
+        "KNXEthInterfaceManuallyInput": "",
+        "stopETSImportIfNoDatapoint": "skip",
+        "loglevel": "debug",
+        "name": "KNX Gateway",
+        "localEchoInTunneling": true,
+        "delaybetweentelegrams": "50",
+        "delaybetweentelegramsfurtherdelayREAD": "1",
+        "ignoreTelegramsWithRepeatedFlag": true,
+        "keyringFileXML": "",
+        "knxSecureSelected": false,
+        "autoReconnect": "yes"
+    }
+]

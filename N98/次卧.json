@@ -1,0 +1,724 @@
+[
+    {
+        "id": "5ec824872cd94a31",
+        "type": "subflow",
+        "name": "AC",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 80,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "d4d4d85cfa3381e0"
+                    },
+                    {
+                        "id": "aeebdc64229a5257"
+                    },
+                    {
+                        "id": "4262a377b349288b"
+                    },
+                    {
+                        "id": "7bfc45a210da7543"
+                    },
+                    {
+                        "id": "94a125713cf50d2b"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 420,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "d4d4d85cfa3381e0",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "94a125713cf50d2b",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "aeebdc64229a5257",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 200,
+                "wires": [
+                    {
+                        "id": "4262a377b349288b",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 420,
+                "y": 240,
+                "wires": [
+                    {
+                        "id": "7bfc45a210da7543",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "d4d4d85cfa3381e0",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "开关",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.Active !== undefined) {\n        flow.set(\"state\", msg.payload.Active);\n        node.log('发送空调开关：' + msg.payload.Active);\n        if (Boolean(msg.payload.Active) === true) {\n            return { payload: true };\n        }\n        else if (Boolean(msg.payload.Active) === false) {\n            return { payload: false };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aeebdc64229a5257",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "设置制热温度",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.HeatingThresholdTemperature !== undefined) {\n        node.log('发送空调制热温度：' + msg.payload.HeatingThresholdTemperature);\n        return { payload: msg.payload.HeatingThresholdTemperature };\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4262a377b349288b",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "设置制冷温度",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.CoolingThresholdTemperature !== undefined) {\n        node.log('发送空调制冷温度：' + msg.payload.CoolingThresholdTemperature);\n        return { payload: msg.payload.CoolingThresholdTemperature };\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7bfc45a210da7543",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "风速",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    var value = 0;\n    if (msg.payload.RotationSpeed !== undefined) {\n        if (msg.payload.RotationSpeed > 0 && msg.payload.RotationSpeed <= 34)\n        {\n            value = 1;\n        }\n        else if (msg.payload.RotationSpeed > 34 && msg.payload.RotationSpeed <= 67)\n        {\n            value = 3;\n        }\n        else if (msg.payload.RotationSpeed > 67 && msg.payload.RotationSpeed <= 101)\n        {\n            value = 5;\n        }\n    }\n    // reset rotationspeed when shutdown.\n    if (msg.payload.Active !== undefined) {\n        if (Boolean(msg.payload.Active) === false) {\n            value = 0;\n        }\n    }\n    node.log('发送空调风速：' + value);\n    return { payload: value };\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "94a125713cf50d2b",
+        "type": "function",
+        "z": "5ec824872cd94a31",
+        "name": "模式",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.TargetHeaterCoolerState !== undefined) {\n        if (msg.payload.TargetHeaterCoolerState === 1) {\n            node.log('发送空调模式：制热');\n            return { payload: 1 };\n        }\n        else if (msg.payload.TargetHeaterCoolerState === 2) {\n            node.log('发送空调模式：制冷');\n            return { payload: 3 };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5d427b4b2a3afe56",
+        "type": "tab",
+        "label": "次卧",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2c1d88ad0768ad08",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/1/133",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "开关反馈",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 180,
+        "y": 580,
+        "wires": [
+            [
+                "025d16a98b1a0e4b",
+                "24d44230374f2d28",
+                "26e705be30712317",
+                "e3e6d8f84afd6ec6"
+            ]
+        ]
+    },
+    {
+        "id": "24d44230374f2d28",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/2/133",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "模式反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 430,
+        "y": 640,
+        "wires": [
+            [
+                "2804ebf3802d8843"
+            ]
+        ]
+    },
+    {
+        "id": "26e705be30712317",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/3/133",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "风速反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 430,
+        "y": 700,
+        "wires": [
+            [
+                "16da4a8deb44bcef"
+            ]
+        ]
+    },
+    {
+        "id": "e3e6d8f84afd6ec6",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/4/133",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "9.001",
+        "initialread": "3",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "设置温度反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 440,
+        "y": 760,
+        "wires": [
+            [
+                "0a4057ca3729dff8"
+            ]
+        ]
+    },
+    {
+        "id": "1b5c09f119cb57e1",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/5/133",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "9.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "实际温度反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 440,
+        "y": 820,
+        "wires": [
+            [
+                "643e6923250df9cd"
+            ]
+        ]
+    },
+    {
+        "id": "07e3bef45c5bfa3b",
+        "type": "homekit-service",
+        "z": "5d427b4b2a3afe56",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "3b304540c9e6ac5f",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "空调",
+        "serviceName": "HeaterCooler",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "IOT DREAM",
+        "model": "1.3.6",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.3.6",
+        "hardwareRev": "1.3.6",
+        "softwareRev": "1.3.6",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "{     \"TargetHeaterCoolerState\": {         \"validValues\": [             1,             2         ]     },     \"CurrentHeaterCoolerState\": {         \"validValues\": [             0,             2,             3         ]     },     \"HeatingThresholdTemperature\": {         \"minValue\": 16,         \"maxValue\": 32,         \"minStep\": 1     },     \"CoolingThresholdTemperature\": {         \"minValue\": 16,         \"maxValue\": 32,         \"minStep\": 1     },     \"RotationSpeed\": {         \"minValue\": 0,         \"maxValue\": 100,         \"minStep\": 33     } }",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 1070,
+        "y": 720,
+        "wires": [
+            [
+                "b0913c7a444d4995"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b0913c7a444d4995",
+        "type": "subflow:5ec824872cd94a31",
+        "z": "5d427b4b2a3afe56",
+        "name": "",
+        "env": [],
+        "x": 1270,
+        "y": 720,
+        "wires": [
+            [
+                "e2b5bac7ee1b6c7b"
+            ],
+            [
+                "f1704f5c66ce6f11"
+            ],
+            [
+                "cacaae7bfe5c8173"
+            ],
+            [
+                "cacaae7bfe5c8173"
+            ],
+            [
+                "2528b59f9a8f2d42"
+            ]
+        ]
+    },
+    {
+        "id": "e2b5bac7ee1b6c7b",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/1/5",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "开关地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1570,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f1704f5c66ce6f11",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/2/5",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "模式地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1570,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2528b59f9a8f2d42",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/3/5",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "风速地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1570,
+        "y": 800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cacaae7bfe5c8173",
+        "type": "knxUltimate",
+        "z": "5d427b4b2a3afe56",
+        "server": "1d670c832649ebb6",
+        "topic": "12/4/5",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "9.001",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "目标温度地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1580,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9d936429ecfef174",
+        "type": "inject",
+        "z": "5d427b4b2a3afe56",
+        "name": "循环获取温度",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 820,
+        "wires": [
+            [
+                "1b5c09f119cb57e1"
+            ]
+        ]
+    },
+    {
+        "id": "643e6923250df9cd",
+        "type": "function",
+        "z": "5d427b4b2a3afe56",
+        "name": "室内温度反馈",
+        "func": "node.log('收到室内温度反馈:'+msg.payload);\nreturn { payload: { \"CurrentTemperature\": msg.payload }}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 820,
+        "wires": [
+            [
+                "07e3bef45c5bfa3b"
+            ]
+        ]
+    },
+    {
+        "id": "16da4a8deb44bcef",
+        "type": "function",
+        "z": "5d427b4b2a3afe56",
+        "name": "风速",
+        "func": "node.log('收到空调风速反馈:'+msg.payload);\nif(msg.payload === 0) \n{\n    return { payload: { \"RotationSpeed\": 0 }}\n}\nelse if(msg.payload === 1) \n{\n    return { payload: { \"RotationSpeed\": 33 } }\n}\nelse if(msg.payload === 3) \n{\n    return { payload: { \"RotationSpeed\": 66 } }\n}\nelse if(msg.payload === 5) \n{\n    return { payload: { \"RotationSpeed\": 100 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 700,
+        "wires": [
+            [
+                "07e3bef45c5bfa3b"
+            ]
+        ]
+    },
+    {
+        "id": "2804ebf3802d8843",
+        "type": "function",
+        "z": "5d427b4b2a3afe56",
+        "name": "模式",
+        "func": "node.log('收到空调模式反馈:'+msg.payload);\nif(msg.payload === 1) \n{\n  return { payload: { \"CurrentHeaterCoolerState\": 2, \"TargetHeaterCoolerState\": 1 }}\n} \nelse if(msg.payload === 3) \n{\n  return { payload: { \"CurrentHeaterCoolerState\": 3, \"TargetHeaterCoolerState\": 2 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 640,
+        "wires": [
+            [
+                "07e3bef45c5bfa3b"
+            ]
+        ]
+    },
+    {
+        "id": "0a4057ca3729dff8",
+        "type": "function",
+        "z": "5d427b4b2a3afe56",
+        "name": "设置温度反馈",
+        "func": "node.log('收到空调设置温度反馈:'+msg.payload);\nvar value  = msg.payload;\nvar HeatingThresholdTemperature = {};\nvar CoolingThresholdTemperature = {};\nHeatingThresholdTemperature.payload = {\"HeatingThresholdTemperature\":value}\nCoolingThresholdTemperature.payload = {\"CoolingThresholdTemperature\":value}\nreturn [HeatingThresholdTemperature,CoolingThresholdTemperature];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 760,
+        "wires": [
+            [
+                "07e3bef45c5bfa3b"
+            ],
+            [
+                "07e3bef45c5bfa3b"
+            ]
+        ]
+    },
+    {
+        "id": "025d16a98b1a0e4b",
+        "type": "function",
+        "z": "5d427b4b2a3afe56",
+        "name": "开关",
+        "func": "node.log('收到空调开关反馈:'+msg.payload);\nif (Boolean(msg.payload) === true) {\n    return { payload: { \"Active\": 1 } }\n}\nelse if (Boolean(msg.payload) === false) {\n    return { payload: { \"Active\": 0 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 580,
+        "wires": [
+            [
+                "07e3bef45c5bfa3b"
+            ]
+        ]
+    },
+    {
+        "id": "1d670c832649ebb6",
+        "type": "knxUltimate-config",
+        "host": "192.168.1.7",
+        "port": "3671",
+        "physAddr": "14.14.14",
+        "hostProtocol": "TunnelUDP",
+        "suppressACKRequest": true,
+        "csv": "",
+        "KNXEthInterface": "Auto",
+        "KNXEthInterfaceManuallyInput": "",
+        "stopETSImportIfNoDatapoint": "skip",
+        "loglevel": "debug",
+        "name": "KNX Gateway",
+        "localEchoInTunneling": true,
+        "delaybetweentelegrams": "50",
+        "delaybetweentelegramsfurtherdelayREAD": "1",
+        "ignoreTelegramsWithRepeatedFlag": true,
+        "keyringFileXML": "",
+        "knxSecureSelected": false,
+        "autoReconnect": "yes"
+    },
+    {
+        "id": "3b304540c9e6ac5f",
+        "type": "homekit-bridge",
+        "bridgeName": "Second bedroom",
+        "pinCode": "5841-3807",
+        "port": "",
+        "advertiser": "bonjour-hap",
+        "allowInsecureRequest": false,
+        "manufacturer": "NRCHKB",
+        "model": "1.6.1",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.6.1",
+        "hardwareRev": "1.6.1",
+        "softwareRev": "1.6.1",
+        "customMdnsConfig": false,
+        "mdnsMulticast": true,
+        "mdnsInterface": "",
+        "mdnsPort": "",
+        "mdnsIp": "",
+        "mdnsTtl": "",
+        "mdnsLoopback": true,
+        "mdnsReuseAddr": true,
+        "allowMessagePassthrough": true
+    }
+]
