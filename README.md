@@ -7,7 +7,7 @@ Integration of KNX into HomeKit through Node-RED.
 4. 导入相应的json
    ![image](https://github.com/new1943/PLM-IKHN/blob/main/IMG/WechatIMG1448.jpg)
 6. 编辑KNX Gateway地址  
-   ![image](https://github.com/new1943/PLM-IKHN/blob/main/IMG/img_2.png)
+   ![image](https://github.com/new1943/PLM-IKHN/blob/main/IMG/WechatIMG1449.jpg)
    ![image](https://github.com/new1943/PLM-IKHN/blob/main/IMG/img_3.png)
 7. 根据https://github.com/jerry-jho/PLMDeepSmart 项目中找出自己户型房间的KNX地址，按设备更改添加删除
 8. Homekit中添加birdge
