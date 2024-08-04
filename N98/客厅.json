@@ -877,10 +877,10 @@
         "x": 810,
         "y": 1040,
         "wires": [
+            [],
             [
-                "7adedb476c177eb5"
-            ],
-            []
+                "244ad3b8d073fd02"
+            ]
         ]
     },
     {
@@ -929,10 +929,10 @@
         "x": 810,
         "y": 1260,
         "wires": [
+            [],
             [
-                "2145fdee49134e62"
-            ],
-            []
+                "eae39615263a7d46"
+            ]
         ]
     },
     {
@@ -1224,11 +1224,11 @@
         ]
     },
     {
-        "id": "825653a2317353e4",
+        "id": "1908894a0ad3c00b",
         "type": "function",
         "z": "5207b905716868ba",
         "name": "",
-        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst target = flow.get(\"target\");\nconst manual = flow.get(\"manual\");\nif (target !== undefined) {\n    if (manual !== undefined) {\n        if (!manual) {\n            let current = 100 - target;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
+        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst sence = flow.get(\"sence\");\nif (msg.payload !== undefined) {\n    if (sence !== undefined) {\n        if (!sence) {\n            let current = 100 - msg.payload;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1236,7 +1236,7 @@
         "finalize": "",
         "libs": [],
         "x": 630,
-        "y": 1000,
+        "y": 980,
         "wires": [
             [
                 "4d1dafb2f77e0d57"
@@ -1244,7 +1244,7 @@
         ]
     },
     {
-        "id": "9a64e71e68010a6e",
+        "id": "c14a66925ab90b38",
         "type": "knxUltimate",
         "z": "5207b905716868ba",
         "server": "1d670c832649ebb6",
@@ -1268,15 +1268,15 @@
         "formatdecimalsvalue": 999,
         "passthrough": "no",
         "x": 420,
-        "y": 1000,
+        "y": 980,
         "wires": [
             [
-                "825653a2317353e4"
+                "1908894a0ad3c00b"
             ]
         ]
     },
     {
-        "id": "f77e45e9d1cdf7f8",
+        "id": "3374402365d13868",
         "type": "knxUltimate",
         "z": "5207b905716868ba",
         "server": "1d670c832649ebb6",
@@ -1300,19 +1300,19 @@
         "formatdecimalsvalue": 999,
         "passthrough": "no",
         "x": 410,
-        "y": 1100,
+        "y": 1080,
         "wires": [
             [
-                "a1842370b428ca71"
+                "30593284c6b4d02f"
             ]
         ]
     },
     {
-        "id": "a1842370b428ca71",
+        "id": "30593284c6b4d02f",
         "type": "function",
         "z": "5207b905716868ba",
         "name": "",
-        "func": "node.log('窗帘2---------------------' + msg.payload);\nflow.set(\"manual\" , true);\nlet count = flow.get('count') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    msg.payload = {\"CurrentPosition\":count , \"TargetPosition\":count};\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current count immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        count++;\n        if (count >= 100) {\n            count = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        count--;\n        if (count <= 0) {\n            count = 0;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
+        "func": "node.log('窗帘2---------------------' + msg.payload);\nlet target = flow.get('target') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    flow.set(\"sence\", true);\n    msg.payload = { \"CurrentPosition\": target, \"TargetPosition\": target };\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current target immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        target++;\n        if (target >= 100) {\n            target = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', target);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        target--;\n        if (target <= 0) {\n            target = 0;\n            sendAndClear();\n        } else {\n            flow.set('target', target);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1320,7 +1320,7 @@
         "finalize": "",
         "libs": [],
         "x": 630,
-        "y": 1100,
+        "y": 1080,
         "wires": [
             [
                 "4d1dafb2f77e0d57"
@@ -1328,61 +1328,11 @@
         ]
     },
     {
-        "id": "7adedb476c177eb5",
+        "id": "9eb836eca87cdba8",
         "type": "function",
         "z": "5207b905716868ba",
         "name": "",
-        "func": "// node.log('----------------------------------窗帘2：' + JSON.stringify(msg.payload));\n// var target = flow.get(\"target\");\n// node.log('----------------------------------窗帘3：' + target);\n// if ((typeof target!== 'undefined' && target!== null) ||!target) { \n//     if (msg.payload && msg.payload.hasOwnProperty('TargetPosition')) {\n//         let a = msg.payload.TargetPosition;\n//         a = 100-a;\n//         if (target!== a) {\n//             msg.payload = a;\n//             flow.set(\"target\", a);\n//             return msg;\n//         }\n//     }\n// }\n\n// Pass only messages coming from homekit node\n// const target = flow.get(\"target\");\n// if (msg.hap.context !== undefined) {\n//     const manual = flow.get(\"manual\");\n//     node.log('======================' + manual);\n//     if (manual !== undefined) {\n//         if (!manual) {\n//             if (msg.payload.TargetPosition !== undefined) {\n//                 let position = 100 - msg.payload.TargetPosition;\n//                 if(target !== position) {\n//                     flow.set(\"target\", position);\n//                     return { payload: position};\n//                 }\n//             }\n//         }\n//     } else {\n//         if (msg.payload.TargetPosition !== undefined) {\n//             let position = 100 - msg.payload.TargetPosition;\n//             if(target !== position) {\n//                 flow.set(\"target\", position);                \n//                 return { payload: position};\n//             }\n//         }\n//     }\n//     flow.set(\"manual\", false);\n// }\n\nconst target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const manual = flow.get(\"manual\");\n    node.log('======================' + manual);\n\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n\n        if (manual === undefined || !manual) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"manual\", false);\n}\n",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1010,
-        "y": 1040,
-        "wires": [
-            [
-                "d36a7d0e1ba1c49a"
-            ]
-        ]
-    },
-    {
-        "id": "d36a7d0e1ba1c49a",
-        "type": "knxUltimate",
-        "z": "5207b905716868ba",
-        "server": "1d670c832649ebb6",
-        "topic": "2/1/65",
-        "setTopicType": "str",
-        "outputtopic": "",
-        "dpt": "5.001",
-        "initialread": 0,
-        "notifyreadrequest": false,
-        "notifyresponse": false,
-        "notifywrite": true,
-        "notifyreadrequestalsorespondtobus": false,
-        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
-        "listenallga": false,
-        "name": "Covering",
-        "outputtype": "write",
-        "outputRBE": "true",
-        "inputRBE": "false",
-        "formatmultiplyvalue": 1,
-        "formatnegativevalue": "leave",
-        "formatdecimalsvalue": 999,
-        "passthrough": "no",
-        "x": 1220,
-        "y": 1040,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "6b6f602e0efec308",
-        "type": "function",
-        "z": "5207b905716868ba",
-        "name": "",
-        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst target = flow.get(\"target\");\nconst manual = flow.get(\"manual\");\nif (target !== undefined) {\n    if (manual !== undefined) {\n        if (!manual) {\n            let current = 100 - target;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
+        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst sence = flow.get(\"sence\");\nif (msg.payload !== undefined) {\n    if (sence !== undefined) {\n        if (!sence) {\n            let current = 100 - msg.payload;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1398,7 +1348,7 @@
         ]
     },
     {
-        "id": "81ca53173c6de0f8",
+        "id": "cb116933be1fc077",
         "type": "knxUltimate",
         "z": "5207b905716868ba",
         "server": "1d670c832649ebb6",
@@ -1425,12 +1375,12 @@
         "y": 1220,
         "wires": [
             [
-                "6b6f602e0efec308"
+                "9eb836eca87cdba8"
             ]
         ]
     },
     {
-        "id": "c0724e28947119f0",
+        "id": "885badb981ac2a3c",
         "type": "knxUltimate",
         "z": "5207b905716868ba",
         "server": "1d670c832649ebb6",
@@ -1457,16 +1407,16 @@
         "y": 1320,
         "wires": [
             [
-                "f71f14903c254c9a"
+                "90e62543f03903e7"
             ]
         ]
     },
     {
-        "id": "f71f14903c254c9a",
+        "id": "90e62543f03903e7",
         "type": "function",
         "z": "5207b905716868ba",
         "name": "",
-        "func": "node.log('窗帘2---------------------' + msg.payload);\nflow.set(\"manual\" , true);\nlet count = flow.get('count') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    msg.payload = {\"CurrentPosition\":count , \"TargetPosition\":count};\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current count immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        count++;\n        if (count >= 100) {\n            count = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        count--;\n        if (count <= 0) {\n            count = 0;\n            sendAndClear();\n        } else {\n            flow.set('count', count);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
+        "func": "node.log('窗帘2---------------------' + msg.payload);\nlet target = flow.get('target') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    flow.set(\"sence\", true);\n    msg.payload = { \"CurrentPosition\": target, \"TargetPosition\": target };\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current target immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        target++;\n        if (target >= 100) {\n            target = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', target);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        target--;\n        if (target <= 0) {\n            target = 0;\n            sendAndClear();\n        } else {\n            flow.set('target', target);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1482,27 +1432,77 @@
         ]
     },
     {
-        "id": "2145fdee49134e62",
+        "id": "244ad3b8d073fd02",
         "type": "function",
         "z": "5207b905716868ba",
         "name": "",
-        "func": "// node.log('----------------------------------窗帘2：' + JSON.stringify(msg.payload));\n// var target = flow.get(\"target\");\n// node.log('----------------------------------窗帘3：' + target);\n// if ((typeof target!== 'undefined' && target!== null) ||!target) { \n//     if (msg.payload && msg.payload.hasOwnProperty('TargetPosition')) {\n//         let a = msg.payload.TargetPosition;\n//         a = 100-a;\n//         if (target!== a) {\n//             msg.payload = a;\n//             flow.set(\"target\", a);\n//             return msg;\n//         }\n//     }\n// }\n\n// Pass only messages coming from homekit node\n// const target = flow.get(\"target\");\n// if (msg.hap.context !== undefined) {\n//     const manual = flow.get(\"manual\");\n//     node.log('======================' + manual);\n//     if (manual !== undefined) {\n//         if (!manual) {\n//             if (msg.payload.TargetPosition !== undefined) {\n//                 let position = 100 - msg.payload.TargetPosition;\n//                 if(target !== position) {\n//                     flow.set(\"target\", position);\n//                     return { payload: position};\n//                 }\n//             }\n//         }\n//     } else {\n//         if (msg.payload.TargetPosition !== undefined) {\n//             let position = 100 - msg.payload.TargetPosition;\n//             if(target !== position) {\n//                 flow.set(\"target\", position);                \n//                 return { payload: position};\n//             }\n//         }\n//     }\n//     flow.set(\"manual\", false);\n// }\n\nconst target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const manual = flow.get(\"manual\");\n    node.log('======================' + manual);\n\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n\n        if (manual === undefined || !manual) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"manual\", false);\n}\n",
+        "func": "const target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const sence = flow.get(\"sence\");\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n        if (sence === undefined || !sence) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"sence\", false);\n}\n",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1010,
-        "y": 1260,
+        "x": 990,
+        "y": 1040,
         "wires": [
             [
-                "28b1d7e11ac27383"
+                "f0545c5ff75ea26b"
             ]
         ]
     },
     {
-        "id": "28b1d7e11ac27383",
+        "id": "f0545c5ff75ea26b",
+        "type": "knxUltimate",
+        "z": "5207b905716868ba",
+        "server": "1d670c832649ebb6",
+        "topic": "2/1/65",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.001",
+        "initialread": 0,
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Covering",
+        "outputtype": "write",
+        "outputRBE": "false",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1180,
+        "y": 1040,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "eae39615263a7d46",
+        "type": "function",
+        "z": "5207b905716868ba",
+        "name": "",
+        "func": "const target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const sence = flow.get(\"sence\");\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n        if (sence === undefined || !sence) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"sence\", false);\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 1260,
+        "wires": [
+            [
+                "38aab3286104cbaa"
+            ]
+        ]
+    },
+    {
+        "id": "38aab3286104cbaa",
         "type": "knxUltimate",
         "z": "5207b905716868ba",
         "server": "1d670c832649ebb6",
@@ -1519,13 +1519,13 @@
         "listenallga": false,
         "name": "Covering",
         "outputtype": "write",
-        "outputRBE": "true",
+        "outputRBE": "false",
         "inputRBE": "false",
         "formatmultiplyvalue": 1,
         "formatnegativevalue": "leave",
         "formatdecimalsvalue": 999,
         "passthrough": "no",
-        "x": 1220,
+        "x": 1180,
         "y": 1260,
         "wires": [
             []
