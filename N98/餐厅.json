@@ -1,5 +1,87 @@
 [
     {
+        "id": "1d424a802d21f14d",
+        "type": "subflow",
+        "name": "New Air",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 420,
+                "y": 380,
+                "wires": [
+                    {
+                        "id": "b29df9cccba8088e"
+                    },
+                    {
+                        "id": "832c667ec1d99709"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 840,
+                "y": 340,
+                "wires": [
+                    {
+                        "id": "b29df9cccba8088e",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 840,
+                "y": 400,
+                "wires": [
+                    {
+                        "id": "832c667ec1d99709",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "b29df9cccba8088e",
+        "type": "function",
+        "z": "1d424a802d21f14d",
+        "name": "开关",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    if (msg.payload.Active !== undefined) {\n        node.log('发送新风开关：' + msg.payload.Active);\n        if (Boolean(msg.payload.Active) === true) {\n            return { payload: true };\n        }\n        else if (Boolean(msg.payload.Active) === false) {\n            return { payload: false };\n        }\n    }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "832c667ec1d99709",
+        "type": "function",
+        "z": "1d424a802d21f14d",
+        "name": "风速",
+        "func": "// Pass only messages coming from homekit node\nif (msg.hap.context !== undefined) {\n    var value = 0;\n    if (msg.payload.RotationSpeed !== undefined) {\n        if (msg.payload.RotationSpeed > 0 && msg.payload.RotationSpeed <= 34)\n        {\n            value = 1;\n        }\n        else if (msg.payload.RotationSpeed > 34 && msg.payload.RotationSpeed <= 67)\n        {\n            value = 2;\n        }\n        else if (msg.payload.RotationSpeed > 67 && msg.payload.RotationSpeed <= 101)\n        {\n            value = 3;\n        }\n    }\n    // reset rotationspeed when shutdown.\n    if (msg.payload.Active !== undefined) {\n        if (Boolean(msg.payload.Active) === false) {\n            value = 0;\n        }\n    }\n    node.log('发送新风风速：' + value);\n    return { payload: value };\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "e1d3965e46fd0043",
         "type": "tab",
         "label": "餐厅",
@@ -334,6 +416,239 @@
                 "f5837e3cbcf2ec44"
             ],
             []
+        ]
+    },
+    {
+        "id": "2bd0e2e8dd892abf",
+        "type": "knxUltimate",
+        "z": "e1d3965e46fd0043",
+        "server": "1d670c832649ebb6",
+        "topic": "14/1/1",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "开关反馈",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 460,
+        "y": 460,
+        "wires": [
+            [
+                "e5c6385b105c6c69",
+                "bfdbc30b73ee47c1"
+            ]
+        ]
+    },
+    {
+        "id": "bfdbc30b73ee47c1",
+        "type": "knxUltimate",
+        "z": "e1d3965e46fd0043",
+        "server": "1d670c832649ebb6",
+        "topic": "14/3/1",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "1",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "风速反馈",
+        "outputtype": "read",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 660,
+        "y": 580,
+        "wires": [
+            [
+                "2652df2deb224ee2"
+            ]
+        ]
+    },
+    {
+        "id": "e5c6385b105c6c69",
+        "type": "function",
+        "z": "e1d3965e46fd0043",
+        "name": "开关",
+        "func": "node.log('收到新风开关反馈:'+msg.payload);\nif (Boolean(msg.payload) === true) {\n    return { payload: { \"Active\": 1,\"CurrentAirPurifierState\":2 } }\n}\nelse if (Boolean(msg.payload) === false) {\n    return { payload: { \"Active\": 0,\"CurrentAirPurifierState\":0 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 460,
+        "wires": [
+            [
+                "a5714097d65d27d2"
+            ]
+        ]
+    },
+    {
+        "id": "2652df2deb224ee2",
+        "type": "function",
+        "z": "e1d3965e46fd0043",
+        "name": "风速",
+        "func": "node.log('收到新风风速反馈:'+msg.payload);\nif(msg.payload === 0) \n{\n    return { payload: { \"RotationSpeed\": 0, \"TargetAirPurifierState\": 0 }}\n}\nelse if(msg.payload === 1) \n{\n    return { payload: { \"RotationSpeed\": 33, \"TargetAirPurifierState\": 1 } }\n}\nelse if(msg.payload === 2) \n{\n    return { payload: { \"RotationSpeed\": 66, \"TargetAirPurifierState\": 1 } }\n}\nelse if(msg.payload === 3) \n{\n    return { payload: { \"RotationSpeed\": 100, \"TargetAirPurifierState\": 1 } }\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 580,
+        "wires": [
+            [
+                "a5714097d65d27d2"
+            ]
+        ]
+    },
+    {
+        "id": "a5714097d65d27d2",
+        "type": "homekit-service",
+        "z": "e1d3965e46fd0043",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "0d2eda8c9f24f70b",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "新风",
+        "serviceName": "AirPurifier",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "NRCHKB",
+        "model": "1.6.1",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.6.1",
+        "hardwareRev": "1.6.1",
+        "softwareRev": "1.6.1",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "{}",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 520,
+        "wires": [
+            [
+                "9ff77a6874a6e78f"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "3cbeb47189a5f210",
+        "type": "knxUltimate",
+        "z": "e1d3965e46fd0043",
+        "server": "1d670c832649ebb6",
+        "topic": "14/1/1",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "1.001",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "开关地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1400,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3163277d7de97419",
+        "type": "knxUltimate",
+        "z": "e1d3965e46fd0043",
+        "server": "1d670c832649ebb6",
+        "topic": "14/3/1",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "风速地址",
+        "outputtype": "write",
+        "outputRBE": "true",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1400,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9ff77a6874a6e78f",
+        "type": "subflow:1d424a802d21f14d",
+        "z": "e1d3965e46fd0043",
+        "name": "",
+        "x": 1200,
+        "y": 520,
+        "wires": [
+            [
+                "3cbeb47189a5f210"
+            ],
+            [
+                "3163277d7de97419"
+            ]
         ]
     },
     {
