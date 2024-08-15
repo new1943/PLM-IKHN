@@ -687,7 +687,7 @@
         "KNXEthInterface": "Auto",
         "KNXEthInterfaceManuallyInput": "",
         "stopETSImportIfNoDatapoint": "skip",
-        "loglevel": "debug",
+        "loglevel": "error",
         "name": "KNX Gateway",
         "localEchoInTunneling": true,
         "delaybetweentelegrams": "50",

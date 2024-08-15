@@ -744,7 +744,7 @@
         "wires": [
             [],
             [
-                "1b03db1805e49890"
+                "4624a50ca6626857"
             ]
         ]
     },
@@ -792,7 +792,7 @@
         "waitForSetupMsg": false,
         "outputs": 2,
         "x": 790,
-        "y": 1280,
+        "y": 1360,
         "wires": [
             [],
             [
@@ -1104,7 +1104,8 @@
         "y": 800,
         "wires": [
             [
-                "7413047c5faeb1b5"
+                "7413047c5faeb1b5",
+                "9683084c271cb60d"
             ]
         ]
     },
@@ -1228,15 +1229,15 @@
         "type": "function",
         "z": "dfd031a2a96aba1c",
         "name": "",
-        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst sence = flow.get(\"sence\");\nif (msg.payload !== undefined) {\n    if (sence !== undefined) {\n        if (!sence) {\n            let current = 100 - msg.payload;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
+        "func": "node.log('bedroom_gauze_curtains_status---------------------' + msg.payload);\nconst target = flow.get(\"bedroom_gauze_curtains_target\");\nconst sence = flow.get(\"bedroom_gauze_curtains_scene\");\nif (msg.payload !== undefined) {\n    if (sence === undefined) {\n        let current = 100 - target;\n        return { payload: { \"CurrentPosition\": current } };\n    } else {\n        let current = 100 - msg.payload;\n        if(current === 99) {\n            current = 100;\n        }\n        return { payload: { \"CurrentPosition\": current, \"TargetPosition\": current } };\n    }\n}\n",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
-        "y": 1220,
+        "x": 610,
+        "y": 1360,
         "wires": [
             [
                 "efe031cb3d082780"
@@ -1252,14 +1253,14 @@
         "setTopicType": "str",
         "outputtopic": "",
         "dpt": "5.001",
-        "initialread": "0",
+        "initialread": "2",
         "notifyreadrequest": false,
         "notifyresponse": true,
         "notifywrite": true,
         "notifyreadrequestalsorespondtobus": false,
         "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
         "listenallga": false,
-        "name": "Covering Status",
+        "name": "Gauze curtains status",
         "outputtype": "update",
         "outputRBE": "false",
         "inputRBE": "true",
@@ -1268,62 +1269,10 @@
         "formatdecimalsvalue": 999,
         "passthrough": "no",
         "x": 380,
-        "y": 1220,
+        "y": 1360,
         "wires": [
             [
                 "d01eca24ab094dc4"
-            ]
-        ]
-    },
-    {
-        "id": "6a489ec992de075f",
-        "type": "knxUltimate",
-        "z": "dfd031a2a96aba1c",
-        "server": "1d670c832649ebb6",
-        "topic": "2/0/68",
-        "setTopicType": "str",
-        "outputtopic": "",
-        "dpt": "5.100",
-        "initialread": "0",
-        "notifyreadrequest": false,
-        "notifyresponse": true,
-        "notifywrite": true,
-        "notifyreadrequestalsorespondtobus": false,
-        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
-        "listenallga": false,
-        "name": "Covering Manual Status",
-        "outputtype": "update",
-        "outputRBE": "false",
-        "inputRBE": "false",
-        "formatmultiplyvalue": 1,
-        "formatnegativevalue": "leave",
-        "formatdecimalsvalue": 999,
-        "passthrough": "no",
-        "x": 370,
-        "y": 1320,
-        "wires": [
-            [
-                "8138b789381dc87d"
-            ]
-        ]
-    },
-    {
-        "id": "8138b789381dc87d",
-        "type": "function",
-        "z": "dfd031a2a96aba1c",
-        "name": "",
-        "func": "node.log('窗帘2---------------------' + msg.payload);\nlet target = flow.get('target') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    flow.set(\"sence\", true);\n    msg.payload = { \"CurrentPosition\": target, \"TargetPosition\": target };\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current target immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        target++;\n        if (target >= 100) {\n            target = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', target);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        target--;\n        if (target <= 0) {\n            target = 0;\n            sendAndClear();\n        } else {\n            flow.set('target', target);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 590,
-        "y": 1320,
-        "wires": [
-            [
-                "efe031cb3d082780"
             ]
         ]
     },
@@ -1332,7 +1281,7 @@
         "type": "function",
         "z": "dfd031a2a96aba1c",
         "name": "",
-        "func": "const target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const sence = flow.get(\"sence\");\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n        if (sence === undefined || !sence) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"sence\", false);\n}\n",
+        "func": "const sence = flow.get(\"bedroom_gauze_curtains_scene\");\nif (msg.hap.context !== undefined) {\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n        if (sence === undefined) {\n            flow.set(\"bedroom_gauze_curtains_target\", position);\n            return { payload: position };\n        } else {\n            flow.set(\"bedroom_gauze_curtains_scene\", undefined);\n        }\n    }\n}\n",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1340,7 +1289,7 @@
         "finalize": "",
         "libs": [],
         "x": 970,
-        "y": 1280,
+        "y": 1360,
         "wires": [
             [
                 "b90e9b81b8c3c3b7"
@@ -1363,7 +1312,7 @@
         "notifyreadrequestalsorespondtobus": false,
         "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
         "listenallga": false,
-        "name": "Covering",
+        "name": "Gauze curtains",
         "outputtype": "write",
         "outputRBE": "false",
         "inputRBE": "false",
@@ -1371,70 +1320,158 @@
         "formatnegativevalue": "leave",
         "formatdecimalsvalue": 999,
         "passthrough": "no",
-        "x": 1160,
-        "y": 1280,
+        "x": 1180,
+        "y": 1360,
         "wires": [
             []
         ]
     },
     {
-        "id": "10056a470f3820c1",
+        "id": "9683084c271cb60d",
+        "type": "homekit-service",
+        "z": "dfd031a2a96aba1c",
+        "isParent": true,
+        "hostType": "0",
+        "bridge": "2f761eeaa39069eb",
+        "accessoryId": "",
+        "parentService": "",
+        "name": "室内温度",
+        "serviceName": "TemperatureSensor",
+        "topic": "",
+        "filter": false,
+        "manufacturer": "NRCHKB",
+        "model": "1.6.1",
+        "serialNo": "Default Serial Number",
+        "firmwareRev": "1.6.1",
+        "hardwareRev": "1.6.1",
+        "softwareRev": "1.6.1",
+        "cameraConfigVideoProcessor": "ffmpeg",
+        "cameraConfigSource": "",
+        "cameraConfigStillImageSource": "",
+        "cameraConfigMaxStreams": 2,
+        "cameraConfigMaxWidth": 1280,
+        "cameraConfigMaxHeight": 720,
+        "cameraConfigMaxFPS": 10,
+        "cameraConfigMaxBitrate": 300,
+        "cameraConfigVideoCodec": "libx264",
+        "cameraConfigAudioCodec": "libfdk_aac",
+        "cameraConfigAudio": false,
+        "cameraConfigPacketSize": 1316,
+        "cameraConfigVerticalFlip": false,
+        "cameraConfigHorizontalFlip": false,
+        "cameraConfigMapVideo": "0:0",
+        "cameraConfigMapAudio": "0:1",
+        "cameraConfigVideoFilter": "scale=1280:720",
+        "cameraConfigAdditionalCommandLine": "-tune zerolatency",
+        "cameraConfigDebug": false,
+        "cameraConfigSnapshotOutput": "disabled",
+        "cameraConfigInterfaceName": "",
+        "characteristicProperties": "{}",
+        "waitForSetupMsg": false,
+        "outputs": 2,
+        "x": 1020,
+        "y": 880,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b5c9b3e0bc918420",
         "type": "function",
         "z": "dfd031a2a96aba1c",
-        "name": "",
-        "func": "node.log('窗帘1---------------------'+msg.payload);\nconst sence = flow.get(\"sence\");\nif (msg.payload !== undefined) {\n    if (sence !== undefined) {\n        if (!sence) {\n            let current = 100 - msg.payload;\n            return { payload: { \"CurrentPosition\": current } };\n        }\n    }\n}\n",
+        "name": "Clear gauze curtains lock",
+        "func": "node.log('receive bedroom gauze curtains sence control:'+msg.payload);\n\nconst source = flow.get(\"bedroom_gauze_curtains_lock\");\n\nif(msg.payload !== 0) {\n    if (source === undefined) {\n        return msg;\n    }\n} else {\n    flow.set(\"bedroom_gauze_curtains_lock\", undefined);\n    flow.set(\"bedroom_gauze_curtains_scene\" , true);\n}\n",
         "outputs": 1,
-        "timeout": "",
+        "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
-        "y": 980,
+        "x": 510,
+        "y": 1460,
         "wires": [
             [
-                "484ea697ccee549a"
+                "89e19c72189730d6"
             ]
         ]
     },
     {
-        "id": "c2ef36f498a18cfd",
-        "type": "knxUltimate",
+        "id": "89e19c72189730d6",
+        "type": "trigger",
         "z": "dfd031a2a96aba1c",
-        "server": "1d670c832649ebb6",
-        "topic": "2/1/67",
-        "setTopicType": "str",
-        "outputtopic": "",
-        "dpt": "5.001",
-        "initialread": "0",
-        "notifyreadrequest": false,
-        "notifyresponse": true,
-        "notifywrite": true,
-        "notifyreadrequestalsorespondtobus": false,
-        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
-        "listenallga": false,
-        "name": "Covering Status",
-        "outputtype": "update",
-        "outputRBE": "false",
-        "inputRBE": "true",
-        "formatmultiplyvalue": 1,
-        "formatnegativevalue": "leave",
-        "formatdecimalsvalue": 999,
-        "passthrough": "no",
-        "x": 380,
-        "y": 980,
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "nul",
+        "op2type": "payl",
+        "duration": "15",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 760,
+        "y": 1460,
         "wires": [
             [
-                "10056a470f3820c1"
+                "f758f77c98e6dbf6"
             ]
         ]
     },
     {
-        "id": "9992301cb3e5d28c",
+        "id": "f758f77c98e6dbf6",
+        "type": "trigger",
+        "z": "dfd031a2a96aba1c",
+        "name": "",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "500",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 970,
+        "y": 1460,
+        "wires": [
+            [
+                "77f04afaeee93627"
+            ]
+        ]
+    },
+    {
+        "id": "77f04afaeee93627",
+        "type": "function",
+        "z": "dfd031a2a96aba1c",
+        "name": "Set gauze curtains lock",
+        "func": "node.log('set bedroom gauze curtains lock:'+msg.payload);\nflow.set(\"bedroom_gauze_curtains_lock\" , true);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 1460,
+        "wires": [
+            [
+                "09084f880435d9c8"
+            ]
+        ]
+    },
+    {
+        "id": "8b9d5cc36d79ca81",
         "type": "knxUltimate",
         "z": "dfd031a2a96aba1c",
         "server": "1d670c832649ebb6",
-        "topic": "2/0/67",
+        "topic": "2/0/68",
         "setTopicType": "str",
         "outputtopic": "",
         "dpt": "5.100",
@@ -1445,36 +1482,66 @@
         "notifyreadrequestalsorespondtobus": false,
         "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
         "listenallga": false,
-        "name": "Covering Manual Status",
-        "outputtype": "update",
+        "name": "Gauze curtains scene status",
+        "outputtype": "write",
         "outputRBE": "false",
         "inputRBE": "false",
         "formatmultiplyvalue": 1,
         "formatnegativevalue": "leave",
         "formatdecimalsvalue": 999,
         "passthrough": "no",
-        "x": 370,
-        "y": 1080,
+        "x": 220,
+        "y": 1460,
         "wires": [
             [
-                "688294bccd7c0728"
+                "b5c9b3e0bc918420"
             ]
         ]
     },
     {
-        "id": "688294bccd7c0728",
+        "id": "09084f880435d9c8",
+        "type": "knxUltimate",
+        "z": "dfd031a2a96aba1c",
+        "server": "1d670c832649ebb6",
+        "topic": "2/0/68",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Gauze curtains scene",
+        "outputtype": "write",
+        "outputRBE": "false",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1500,
+        "y": 1460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bd43e04bcaa91c35",
         "type": "function",
         "z": "dfd031a2a96aba1c",
         "name": "",
-        "func": "node.log('窗帘2---------------------' + msg.payload);\nlet target = flow.get('target') || 0;\nlet timer = context.get('timer') || null;\nlet mode = msg.payload; // 0 for stop, 1 for decrement, 2 for increment\nlet interval = 120; // 120ms interval\n\n// Function to clear the timer and send the current count\nfunction sendAndClear() {\n    clearTimeout(timer);\n    context.set('timer', null);\n    flow.set(\"sence\", true);\n    msg.payload = { \"CurrentPosition\": target, \"TargetPosition\": target };\n    node.send(msg);\n}\n\nif (mode === 0) {\n    // If mode is 0, stop the counting and send the current target immediately\n    sendAndClear();\n} else if (mode === 1) {\n    if (timer) return null; // If already counting, ignore the input\n    function increment() {\n        target++;\n        if (target >= 100) {\n            target = 100;\n            sendAndClear();\n        } else {\n            flow.set('count', target);\n            timer = setTimeout(increment, interval);\n            context.set('timer', timer);\n        }\n    }\n    increment();\n} else if (mode === 2) {\n    if (timer) return null; // If already counting, ignore the input\n    function decrement() {\n        target--;\n        if (target <= 0) {\n            target = 0;\n            sendAndClear();\n        } else {\n            flow.set('target', target);\n            timer = setTimeout(decrement, interval);\n            context.set('timer', timer);\n        }\n    }\n    decrement();\n} else {\n    return null; // Invalid input, do nothing\n}",
+        "func": "node.log('bedroom_cloth_curtains_status---------------------' + msg.payload);\nconst target = flow.get(\"bedroom_cloth_curtains_target\");\nconst sence = flow.get(\"bedroom_cloth_curtains_scene\");\nif (msg.payload !== undefined) {\n    if (sence === undefined) {\n        let current = 100 - target;\n        return { payload: { \"CurrentPosition\": current } };\n    } else {\n        let current = 100 - msg.payload;\n        if(current === 99) {\n            current = 100;\n        }\n        return { payload: { \"CurrentPosition\": current, \"TargetPosition\": current } };\n    }\n}\n",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
-        "y": 1080,
+        "x": 610,
+        "y": 1020,
         "wires": [
             [
                 "484ea697ccee549a"
@@ -1482,11 +1549,43 @@
         ]
     },
     {
-        "id": "1b03db1805e49890",
+        "id": "a3d85dae7dfe327c",
+        "type": "knxUltimate",
+        "z": "dfd031a2a96aba1c",
+        "server": "1d670c832649ebb6",
+        "topic": "2/1/67",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.001",
+        "initialread": "2",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Cloth curtains status",
+        "outputtype": "update",
+        "outputRBE": "false",
+        "inputRBE": "true",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 370,
+        "y": 1020,
+        "wires": [
+            [
+                "bd43e04bcaa91c35"
+            ]
+        ]
+    },
+    {
+        "id": "4624a50ca6626857",
         "type": "function",
         "z": "dfd031a2a96aba1c",
         "name": "",
-        "func": "const target = flow.get(\"target\");\n\nif (msg.hap.context !== undefined) {\n    const sence = flow.get(\"sence\");\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n        if (sence === undefined || !sence) {\n            if (target !== position) {\n                flow.set(\"target\", position);\n                return { payload: position };\n            }\n        }\n    }\n\n    flow.set(\"sence\", false);\n}\n",
+        "func": "const sence = flow.get(\"bedroom_cloth_curtains_scene\");\nif (msg.hap.context !== undefined) {\n    if (msg.payload.TargetPosition !== undefined) {\n        let position = 100 - msg.payload.TargetPosition;\n        if (sence === undefined) {\n            flow.set(\"bedroom_cloth_curtains_target\", position);\n            return { payload: position };\n        } else {\n            flow.set(\"bedroom_cloth_curtains_scene\", undefined);\n        }\n    }\n}\n",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1497,12 +1596,12 @@
         "y": 1020,
         "wires": [
             [
-                "f528f5e96304072b"
+                "020d19ae38f5e2e7"
             ]
         ]
     },
     {
-        "id": "f528f5e96304072b",
+        "id": "020d19ae38f5e2e7",
         "type": "knxUltimate",
         "z": "dfd031a2a96aba1c",
         "server": "1d670c832649ebb6",
@@ -1517,7 +1616,7 @@
         "notifyreadrequestalsorespondtobus": false,
         "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
         "listenallga": false,
-        "name": "Covering",
+        "name": "Cloth curtains",
         "outputtype": "write",
         "outputRBE": "false",
         "inputRBE": "false",
@@ -1525,8 +1624,160 @@
         "formatnegativevalue": "leave",
         "formatdecimalsvalue": 999,
         "passthrough": "no",
-        "x": 1160,
+        "x": 1180,
         "y": 1020,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c90f7c9d1107c9d6",
+        "type": "function",
+        "z": "dfd031a2a96aba1c",
+        "name": "Clear cloth curtains lock",
+        "func": "node.log('receive bedroom cloth curtains sence control:'+msg.payload);\n\nconst source = flow.get(\"bedroom_cloth_curtains_lock\");\n\nif(msg.payload !== 0) {\n    if (source === undefined) {\n        return msg;\n    }\n} else {\n    flow.set(\"bedroom_cloth_curtains_lock\", undefined);\n    flow.set(\"bedroom_cloth_curtains_scene\" , true);\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 1120,
+        "wires": [
+            [
+                "ac2d5223bb6c3a91"
+            ]
+        ]
+    },
+    {
+        "id": "ac2d5223bb6c3a91",
+        "type": "trigger",
+        "z": "dfd031a2a96aba1c",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "nul",
+        "op2type": "payl",
+        "duration": "15",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 780,
+        "y": 1120,
+        "wires": [
+            [
+                "6510a5fe7a147458"
+            ]
+        ]
+    },
+    {
+        "id": "6510a5fe7a147458",
+        "type": "trigger",
+        "z": "dfd031a2a96aba1c",
+        "name": "",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "500",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 990,
+        "y": 1120,
+        "wires": [
+            [
+                "10430b087d7d1b3b"
+            ]
+        ]
+    },
+    {
+        "id": "10430b087d7d1b3b",
+        "type": "function",
+        "z": "dfd031a2a96aba1c",
+        "name": "Set cloth curtains lock",
+        "func": "node.log('set bedroom cloth curtains lock:'+msg.payload);\nflow.set(\"bedroom_cloth_curtains_lock\" , true);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1220,
+        "y": 1120,
+        "wires": [
+            [
+                "80d9db10e64c005a"
+            ]
+        ]
+    },
+    {
+        "id": "1e8f3edad88d6873",
+        "type": "knxUltimate",
+        "z": "dfd031a2a96aba1c",
+        "server": "1d670c832649ebb6",
+        "topic": "2/0/67",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": true,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Cloth curtains scene status",
+        "outputtype": "write",
+        "outputRBE": "false",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 240,
+        "y": 1120,
+        "wires": [
+            [
+                "c90f7c9d1107c9d6"
+            ]
+        ]
+    },
+    {
+        "id": "80d9db10e64c005a",
+        "type": "knxUltimate",
+        "z": "dfd031a2a96aba1c",
+        "server": "1d670c832649ebb6",
+        "topic": "2/0/67",
+        "setTopicType": "str",
+        "outputtopic": "",
+        "dpt": "5.100",
+        "initialread": "0",
+        "notifyreadrequest": false,
+        "notifyresponse": false,
+        "notifywrite": true,
+        "notifyreadrequestalsorespondtobus": false,
+        "notifyreadrequestalsorespondtobusdefaultvalueifnotinitialized": "0",
+        "listenallga": false,
+        "name": "Cloth curtains scene",
+        "outputtype": "write",
+        "outputRBE": "false",
+        "inputRBE": "false",
+        "formatmultiplyvalue": 1,
+        "formatnegativevalue": "leave",
+        "formatdecimalsvalue": 999,
+        "passthrough": "no",
+        "x": 1520,
+        "y": 1120,
         "wires": [
             []
         ]
@@ -1567,7 +1818,7 @@
         "KNXEthInterface": "Auto",
         "KNXEthInterfaceManuallyInput": "",
         "stopETSImportIfNoDatapoint": "skip",
-        "loglevel": "debug",
+        "loglevel": "error",
         "name": "KNX Gateway",
         "localEchoInTunneling": true,
         "delaybetweentelegrams": "50",
